@@ -1,9 +1,15 @@
 #include "gbx.h"
 
+enum COMP_MODE {
+    AUTO = 0,
+    COMPRESS = 1,
+    UNCOMPRESS = 2
+};
+
 bool verbose = false;
 uint8_t compmode = AUTO;
 
-const char* VER = "1.0.3";
+const char* VER = "1.0.4";
 
 void prnt_help() {
     printf("GBXLZO v%s by GreffMASTER\n", VER);

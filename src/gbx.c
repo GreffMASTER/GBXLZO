@@ -1,7 +1,6 @@
 #include "gbx.h"
 
 gbx_file* read_gbx_file(char* path) {
-    
     errno = 0;
     FILE* ingbxfile = fopen(path, "rb");
     if(ingbxfile==NULL) {
@@ -101,11 +100,7 @@ gbx_file* read_gbx_file(char* path) {
             red = fread(gbx->bodydata, sizeof(char), gbx->bodysize, ingbxfile);
             break;
     }
-
-    
-
     fclose(ingbxfile);
-
     return gbx;
 }
 
@@ -117,16 +112,16 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
     }
     if(verbose) printf("Saving to \"%s\"\n", path);
     int wrote = 0;
-    wrote += fwrite("GBX", sizeof(char), 3, outgbxfile);                    // Magic
-    wrote += fwrite(&gbx->version, sizeof(gbx->version), 1, outgbxfile);    // Version
-    wrote += fwrite(&gbx->type, sizeof(gbx->type), 1, outgbxfile);          // Type (B)
-    wrote += fwrite("U", sizeof(char), 1, outgbxfile);                      // Head compress (U)
-    if(compress) {                                                          // Body compress
-        wrote += fwrite("C", sizeof(char), 1, outgbxfile);                  // (C)
+    wrote += fwrite("GBX", sizeof(char), 3, outgbxfile);                        // Magic
+    wrote += fwrite(&gbx->version, sizeof(gbx->version), 1, outgbxfile);        // Version
+    wrote += fwrite(&gbx->type, sizeof(gbx->type), 1, outgbxfile);              // Type (B)
+    wrote += fwrite("U", sizeof(char), 1, outgbxfile);                          // Head compress (U)
+    if(compress) {                                                              // Body compress
+        wrote += fwrite("C", sizeof(char), 1, outgbxfile);                      // (C)
     } else {
-        wrote += fwrite("U", sizeof(char), 1, outgbxfile);                  // (U)
+        wrote += fwrite("U", sizeof(char), 1, outgbxfile);                      // (U)
     }
-    wrote += fwrite(&gbx->unknown, sizeof(char), 1, outgbxfile);            // Unknown (R)
+    wrote += fwrite(&gbx->unknown, sizeof(char), 1, outgbxfile);                // Unknown (R)
 
     wrote += fwrite(&gbx->gbxclass, sizeof(gbx->gbxclass), 1, outgbxfile);      // Node class
     wrote += fwrite(&gbx->headsize, sizeof(gbx->headsize), 1, outgbxfile);      // Head size
@@ -138,14 +133,13 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
     
     if(compress) {
         int compsize;
-        char* compdata = NULL;
-        compdata = malloc( (gbx->bodysize * 2) / 16 + 64 + 3);
+        char* compdata = malloc( (gbx->bodysize + gbx->bodysize) / 16 + 64 + 3);
         if(verbose) printf("Compressing...\n");
         lzo1x_1_compress(gbx->bodydata, gbx->bodysize, compdata, &compsize, wrkmem);
+        if(verbose) printf("Compressed, compressed size %d\n", compsize);
         wrote += fwrite(&gbx->bodysize, sizeof(gbx->bodysize), 1, outgbxfile);
         wrote += fwrite(&compsize, sizeof(compsize), 1, outgbxfile);
         wrote += fwrite(compdata, sizeof(char), compsize, outgbxfile);
-        free(compdata);
         printf("File compressed successfully!\n");
     } else {
         wrote += fwrite(gbx->bodydata, sizeof(char), gbx->bodysize, outgbxfile);
@@ -155,9 +149,10 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
 }
 
 void free_gbx_file(gbx_file* gbx) {
-    if(gbx->headdata != NULL) free(gbx->headdata);
+    if(gbx->headdata != NULL)   free(gbx->headdata);
     if(gbx->reftabdata != NULL) free(gbx->reftabdata);
-    free(gbx->bodydata);
+    
+    
     free(gbx);
 }
 
