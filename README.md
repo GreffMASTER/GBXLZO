@@ -7,6 +7,9 @@ Parameters:
 - `-c`  -  only compress
 - `-u`  -  only uncompress
 - `-o <path>`  -  output path  
+
+Example:  
+`gbxlzo Race01.Challenge.Gbx -u -v -o Race01.Uncompressed.Challenge.Gbx`  
   
 If output path is not provided, the input file will be used as output.
 By default, the program will decompress compressed files and vice versa.
