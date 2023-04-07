@@ -11,6 +11,9 @@ Parameters:
 If output path is not provided, the input file will be used as output.
 By default, the program will decompress compressed files and vice versa.
 
+## miniLZO  
+This project uses the miniLZO library. You can read the license [here](https://github.com/GreffMASTER/GBXLZO/blob/main/LZOLICENSE).  
+
 ## Compile instructions  
 This project requires gcc compiler, make and cmake.  
 
