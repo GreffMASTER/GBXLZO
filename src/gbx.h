@@ -1,9 +1,6 @@
 #ifndef __GBX_H_INCLUDED
 #define __GBX_H_INCLUDED 1
 
-#pragma GCC push_options
-#pragma GCC optimize ("O0")
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -42,7 +39,5 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress);
 void free_gbx_file(gbx_file* gbx);
 int read_reftab_dir(FILE* ingbxfile, int count);
 int read_ref_files(FILE* ingbxfile, int count);
-
-#pragma GCC pop_options
 
 #endif /* already included */

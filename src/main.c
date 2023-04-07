@@ -3,7 +3,7 @@
 bool verbose = false;
 uint8_t compmode = AUTO;
 
-const char* VER = "1.0.2";
+const char* VER = "1.0.3";
 
 void prnt_help() {
     printf("GBXLZO v%s by GreffMASTER\n", VER);
@@ -12,7 +12,7 @@ void prnt_help() {
     printf("Parameters:\n");
     printf("-v         -  verbose\n");
     printf("-c         -  only compress\n");
-    printf("-u         -  only uncompress\n");
+    printf("-u         -  only decompress\n");
     printf("-o <path>  -  output path");
     printf("If output path is not provided, the input file will be used as output");
     printf("By default, the program will decompress compressed files and vice versa");

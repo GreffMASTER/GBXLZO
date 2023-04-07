@@ -1,6 +1,7 @@
 #include "gbx.h"
 
 gbx_file* read_gbx_file(char* path) {
+    
     errno = 0;
     FILE* ingbxfile = fopen(path, "rb");
     if(ingbxfile==NULL) {
@@ -44,9 +45,11 @@ gbx_file* read_gbx_file(char* path) {
     if(verbose) printf("Header size: %d\n", gbx->headsize);
     gbx->headdata = malloc(gbx->headsize);
     red += fread(gbx->headdata, sizeof(char), gbx->headsize, ingbxfile);
-    red += fread(&gbx->numnodes, sizeof(gbx->numnodes), 1, ingbxfile);
-    red += fread(&gbx->numexnodes, sizeof(gbx->numexnodes), 1, ingbxfile);
 
+    red += fread(&gbx->numnodes, sizeof(gbx->numnodes), 1, ingbxfile);
+    if(verbose) printf("Number of nodes: %d\n", gbx->numnodes);
+    red += fread(&gbx->numexnodes, sizeof(gbx->numexnodes), 1, ingbxfile);
+    if(verbose) printf("Number of ex nodes: %d\n", gbx->numexnodes);
     gbx->reftabdata = NULL;
     
     if(gbx->numexnodes > 0) {
@@ -54,6 +57,7 @@ gbx_file* read_gbx_file(char* path) {
         int reftaboffset = ftell(ingbxfile);    // ref tab position
         int anclev; // ancestor level
         refred += fread(&anclev, sizeof(anclev), 1, ingbxfile) * sizeof(anclev);
+        if(verbose) printf("Ancestor level %d\n", anclev);
         int subdir; // subdir count
         refred += fread(&subdir, sizeof(subdir), 1, ingbxfile) * sizeof(subdir);
         refred += read_reftab_dir(ingbxfile, subdir);
@@ -64,21 +68,26 @@ gbx_file* read_gbx_file(char* path) {
         gbx->reftabsize = refred;
     }
 
+
     // BODY!!!
 
     int curpos;
     int cosize;
+    int bsize = 0;
     char* codata = NULL;
     switch(gbx->bodycompr) {
         case 'C':
             red += fread(&gbx->bodysize, sizeof(gbx->bodysize), 1, ingbxfile);
+            bsize = gbx->bodysize;
             red += fread(&cosize, sizeof(cosize), 1, ingbxfile);
             if(verbose) printf("Uncompressed size: %d, Compressed size: %d\n", gbx->bodysize, cosize);
+            
             codata = malloc(cosize);
             red += fread(codata, sizeof(char), cosize, ingbxfile);
-            gbx->bodydata = malloc(gbx->bodysize);
+            gbx->bodydata = malloc(bsize);
             if(verbose) printf("Decompressing...\n");
-            lzo1x_decompress(codata,cosize,gbx->bodydata,&gbx->bodysize,NULL);
+            lzo1x_decompress(codata,cosize,gbx->bodydata,&bsize,NULL);
+            
             free(codata);
             break;
         case 'U':
@@ -92,6 +101,8 @@ gbx_file* read_gbx_file(char* path) {
             red = fread(gbx->bodydata, sizeof(char), gbx->bodysize, ingbxfile);
             break;
     }
+
+    
 
     fclose(ingbxfile);
 
@@ -120,11 +131,11 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
     wrote += fwrite(&gbx->gbxclass, sizeof(gbx->gbxclass), 1, outgbxfile);      // Node class
     wrote += fwrite(&gbx->headsize, sizeof(gbx->headsize), 1, outgbxfile);      // Head size
     wrote += fwrite(gbx->headdata, sizeof(char), gbx->headsize, outgbxfile);    // Head data[Head size]
-
+    
     wrote += fwrite(&gbx->numnodes, sizeof(gbx->numnodes), 1, outgbxfile);      // Num nodes
     wrote += fwrite(&gbx->numexnodes, sizeof(gbx->numexnodes), 1, outgbxfile);  // Num ex nodes
-    wrote += fwrite(&gbx->reftabdata, sizeof(char), gbx->reftabsize, outgbxfile);// Ref table
-
+    wrote += fwrite(gbx->reftabdata, sizeof(char), gbx->reftabsize, outgbxfile);// Ref table
+    
     if(compress) {
         int compsize;
         char* compdata = NULL;
