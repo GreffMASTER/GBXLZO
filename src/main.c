@@ -9,7 +9,7 @@ enum COMP_MODE {
 bool verbose = false;
 uint8_t compmode = AUTO;
 
-const char* VER = "1.0.4";
+const char* VER = "1.0.5";
 
 void prnt_help() {
     printf("GBXLZO v%s by GreffMASTER\n", VER);

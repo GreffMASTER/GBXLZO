@@ -60,7 +60,7 @@ gbx_file* read_gbx_file(char* path) {
         int subdir; // subdir count
         refred += fread(&subdir, sizeof(subdir), 1, ingbxfile) * sizeof(subdir);
         refred += read_reftab_dir(ingbxfile, subdir);
-        refred += read_ref_files(ingbxfile, gbx->numexnodes);
+        refred += read_ref_files(ingbxfile, gbx->numexnodes, gbx->version);
         gbx->reftabdata = malloc(refred);
         fseek(ingbxfile, reftaboffset, SEEK_SET);
         red += fread(gbx->reftabdata, sizeof(char), refred, ingbxfile);
@@ -86,7 +86,7 @@ gbx_file* read_gbx_file(char* path) {
             gbx->bodydata = malloc(bsize);
             if(verbose) printf("Decompressing...\n");
             lzo1x_decompress(codata,cosize,gbx->bodydata,&bsize,NULL);
-            
+            if(verbose) printf("Decompressed!\n");
             free(codata);
             break;
         case 'U':
@@ -151,8 +151,6 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
 void free_gbx_file(gbx_file* gbx) {
     if(gbx->headdata != NULL)   free(gbx->headdata);
     if(gbx->reftabdata != NULL) free(gbx->reftabdata);
-    
-    
     free(gbx);
 }
 
@@ -161,7 +159,8 @@ int read_reftab_dir(FILE* ingbxfile, int count) {
     for(int i=0;i<count;i++) {
         int leng;
         red += fread(&leng, sizeof(leng), 1, ingbxfile) * sizeof(leng);
-        char* dirname = malloc(leng);
+        char* dirname = malloc(leng+1);
+        dirname[leng] = '\0';
         red += fread(dirname, sizeof(char), leng, ingbxfile);
         int subdir;
         red += fread(&subdir, sizeof(subdir), 1, ingbxfile) * sizeof(subdir);
@@ -171,19 +170,27 @@ int read_reftab_dir(FILE* ingbxfile, int count) {
     return red;
 }
 
-int read_ref_files(FILE* ingbxfile, int count) {
+int read_ref_files(FILE* ingbxfile, int count, uint16_t gbxver) {
     int refred = 0;
     for(int i=0;i<count;i++) {
         int flags;
         refred += fread(&flags, sizeof(flags), 1, ingbxfile) * sizeof(flags);
-        int leng;
-        refred += fread(&leng, sizeof(leng), 1, ingbxfile) * sizeof(leng);
-        char* filname = malloc(leng);
-        refred += fread(filname, sizeof(char), leng, ingbxfile);
-        refred += fread(&flags, sizeof(flags), 1, ingbxfile) * sizeof(flags);  // Useless for this purpose
-        refred += fread(&flags, sizeof(flags), 1, ingbxfile) * sizeof(flags);  // Useless for this purpose
-        refred += fread(&flags, sizeof(flags), 1, ingbxfile) * sizeof(flags);  // Useless for this purpose
-        free(filname);
+        if((flags & 4) == 0) {
+            int leng;
+            refred += fread(&leng, sizeof(leng), 1, ingbxfile) * sizeof(leng);
+            char* filname = malloc(leng+1);
+            filname[leng] = '\0';
+            refred += fread(filname, sizeof(char), leng, ingbxfile);
+            free(filname);
+        } else {
+            uint32_t resindex;
+            refred += fread(&resindex, sizeof(resindex), 1, ingbxfile) * sizeof(resindex);  // resource index
+        }
+        int useless;
+        refred += fread(&useless, sizeof(useless), 1, ingbxfile) * sizeof(useless);  // Useless for this purpose
+        if(gbxver >= 5) refred += fread(&useless, sizeof(useless), 1, ingbxfile) * sizeof(useless);  // Useless for this purpose
+        if((flags & 4) == 0) refred += fread(&useless, sizeof(useless), 1, ingbxfile) * sizeof(useless);  // Useless for this purpose
+        
     }
     return refred;
 }

@@ -38,6 +38,6 @@ gbx_file* read_gbx_file(char* path);
 void write_gbx_file(char* path, gbx_file* gbx, bool compress);
 void free_gbx_file(gbx_file* gbx);
 int read_reftab_dir(FILE* ingbxfile, int count);
-int read_ref_files(FILE* ingbxfile, int count);
+int read_ref_files(FILE* ingbxfile, int count, uint16_t gbxver);
 
 #endif /* already included */
