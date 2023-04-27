@@ -22,5 +22,6 @@ This project uses the miniLZO library. You can read the license [here](https://g
 This project requires gcc compiler, make and cmake.  
 
 `git clone https://github.com/GreffMASTER/GBXLZO/`  
-`mkdir build && cmake ..`  
+`mkdir build && cd build`  
+`cmake ..`  
 `make`
