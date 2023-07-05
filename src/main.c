@@ -1,7 +1,7 @@
 #include "gbx.h"
 #include <argp.h>
 
-#define VER "1.0.7"
+#define VER "1.0.8"
 
 enum COMP_MODE {
     AUTO = 0,
@@ -63,7 +63,7 @@ static struct argp argp = { options, argp_parser, args_doc, doc, 0, 0, 0 };
 int main(int argc, char** argv) {
     
     argp_parse(&argp, argc, argv, 0, 0, 0);
-
+    if(outpath==NULL) outpath = inpath; // if no output is provided, use input as output (replace the file)
     if (lzo_init() != LZO_E_OK) {
         printf("Error: failed to initialize LZO\n");
         return 3;

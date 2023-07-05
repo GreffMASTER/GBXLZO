@@ -20,6 +20,11 @@ gbx_file* read_gbx_file(char* path) {
     if(verbose) printf("GBX file\n");
     red += fread(&gbx->version, sizeof(gbx->version), 1, ingbxfile);
     if(verbose) printf("Version %d\n", gbx->version);
+    if(gbx->version < 3) {
+        fclose(ingbxfile);
+        printf("Error: only gbx versions >= 3 are supported\n");
+        return NULL;
+    }
     red += fread(&gbx->type, sizeof(gbx->type), 1, ingbxfile);
     if(verbose) printf("Type %c\n", gbx->type);
     switch(gbx->type) {
@@ -37,14 +42,17 @@ gbx_file* read_gbx_file(char* path) {
     red += fread(&gbx->headcompr, sizeof(gbx->headcompr), 1, ingbxfile); // unused, always U
     red += fread(&gbx->bodycompr, sizeof(gbx->bodycompr), 1, ingbxfile);
     if(verbose) printf("Body compressed %c\n", gbx->bodycompr);
-    red += fread(&gbx->unknown, sizeof(gbx->unknown), 1, ingbxfile);
-    if(verbose) printf("Unknown byte %c\n", gbx->unknown);
+    if(gbx->version >= 4) {
+        red += fread(&gbx->unknown, sizeof(gbx->unknown), 1, ingbxfile);
+        if(verbose) printf("Unknown byte %c\n", gbx->unknown);
+    }
     red += fread(&gbx->gbxclass, sizeof(gbx->gbxclass), 1, ingbxfile);
-    red += fread(&gbx->headsize, sizeof(gbx->headsize), 1, ingbxfile);
-    if(verbose) printf("Header size: %d\n", gbx->headsize);
-    gbx->headdata = malloc(gbx->headsize);
-    red += fread(gbx->headdata, sizeof(char), gbx->headsize, ingbxfile);
-
+    if(gbx->version >= 6) {
+        red += fread(&gbx->headsize, sizeof(gbx->headsize), 1, ingbxfile);
+        if(verbose) printf("Header size: %d\n", gbx->headsize);
+        gbx->headdata = malloc(gbx->headsize);
+        red += fread(gbx->headdata, sizeof(char), gbx->headsize, ingbxfile);
+    }
     red += fread(&gbx->numnodes, sizeof(gbx->numnodes), 1, ingbxfile);
     if(verbose) printf("Number of nodes: %d\n", gbx->numnodes);
     red += fread(&gbx->numexnodes, sizeof(gbx->numexnodes), 1, ingbxfile);
@@ -121,12 +129,15 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
     } else {
         wrote += fwrite("U", sizeof(char), 1, outgbxfile);                      // (U)
     }
-    wrote += fwrite(&gbx->unknown, sizeof(char), 1, outgbxfile);                // Unknown (R)
+    if(gbx->version >= 4) {
+        wrote += fwrite(&gbx->unknown, sizeof(char), 1, outgbxfile);            // Unknown (R)
+    }
 
     wrote += fwrite(&gbx->gbxclass, sizeof(gbx->gbxclass), 1, outgbxfile);      // Node class
-    wrote += fwrite(&gbx->headsize, sizeof(gbx->headsize), 1, outgbxfile);      // Head size
-    wrote += fwrite(gbx->headdata, sizeof(char), gbx->headsize, outgbxfile);    // Head data[Head size]
-    
+    if(gbx->version >= 6) {
+        wrote += fwrite(&gbx->headsize, sizeof(gbx->headsize), 1, outgbxfile);      // Head size
+        wrote += fwrite(gbx->headdata, sizeof(char), gbx->headsize, outgbxfile);    // Head data[Head size]
+    }
     wrote += fwrite(&gbx->numnodes, sizeof(gbx->numnodes), 1, outgbxfile);      // Num nodes
     wrote += fwrite(&gbx->numexnodes, sizeof(gbx->numexnodes), 1, outgbxfile);  // Num ex nodes
     wrote += fwrite(gbx->reftabdata, sizeof(char), gbx->reftabsize, outgbxfile);// Ref table
