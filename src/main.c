@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
             } else if(strcmp(argv[i], "-o") == 0) {
                 requiredargs += 2;
                 if(argc<requiredargs) {
-                    printf("-o parameter requires a path");
+                    printf("-o parameter requires a path\n");
                     prnt_help();
                     return 0;
                 }
