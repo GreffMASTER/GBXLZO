@@ -9,7 +9,7 @@ enum COMP_MODE {
 bool verbose = false;
 uint8_t compmode = AUTO;
 
-const char* VER = "1.0.5";
+const char* VER = "1.0.6";
 
 void prnt_help() {
     printf("GBXLZO v%s by GreffMASTER\n", VER);
@@ -19,9 +19,9 @@ void prnt_help() {
     printf("-v         -  verbose\n");
     printf("-c         -  only compress\n");
     printf("-u         -  only decompress\n");
-    printf("-o <path>  -  output path");
-    printf("If output path is not provided, the input file will be used as output");
-    printf("By default, the program will decompress compressed files and vice versa");
+    printf("-o <path>  -  output path\n");
+    printf("If output path is not provided, the input file will be used as output\n");
+    printf("By default, the program will decompress compressed files and vice versa\n");
 }
 
 int main(int argc, char** argv) {
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
         } else if(strcmp(argv[i], "-o") == 0) {
             requiredargs += 2;
             if(argc<requiredargs) {
-                printf("-o parameter requires a path");
+                printf("-o parameter requires a path\n");
                 prnt_help();
                 return 0;
             }

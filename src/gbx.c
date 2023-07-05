@@ -133,7 +133,7 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
     
     if(compress) {
         int compsize;
-        char* compdata = malloc( (gbx->bodysize + gbx->bodysize) / 16 + 64 + 3);
+        char* compdata = malloc( gbx->bodysize + gbx->bodysize / 16 + 64 + 3);
         if(verbose) printf("Compressing...\n");
         lzo1x_1_compress(gbx->bodydata, gbx->bodysize, compdata, &compsize, wrkmem);
         if(verbose) printf("Compressed, compressed size %d\n", compsize);
