@@ -4,7 +4,7 @@ gbx_file* read_gbx_file(char* path) {
     errno = 0;
     FILE* ingbxfile = fopen(path, "rb");
     if(ingbxfile==NULL) {
-        printf("Error: could not open file \"%s\", errno: %d\n", path, errno);
+        printf("Error: could not open file \"%s\" (%s)\n", path, strerror(errno));
         return NULL;
     }
     // Reading the file
@@ -112,11 +112,12 @@ gbx_file* read_gbx_file(char* path) {
     return gbx;
 }
 
-void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
+int write_gbx_file(char* path, gbx_file* gbx, bool compress) {
     errno = 0;
     FILE* outgbxfile = fopen(path, "wb");
     if(outgbxfile==NULL) {
-        printf("Error: could not open file \"%s\", errno: %d\n", path, errno);
+        printf("Error: could not open file \"%s\" (%s)\n", path, strerror(errno));
+        return 1;
     }
     if(verbose) printf("Saving to \"%s\"\n", path);
     int wrote = 0;
@@ -157,6 +158,7 @@ void write_gbx_file(char* path, gbx_file* gbx, bool compress) {
         printf("File decompressed successfully!\n");
     }
     fclose(outgbxfile);
+    return 0;
 }
 
 void free_gbx_file(gbx_file* gbx) {
