@@ -11,13 +11,13 @@ Parameters:
   
 Usage (Linux): `gbxlzo [OPTION...] <infile>`  
 Parameters:  
-- `c`, `--compress`             only compress
-- `d`, `--decompress`           only decompress
-- `o`, `--output=FILE`          output path
-- `v`, `--verbose`              verbose
-- `?`, `--help`                 Give this help list
+- `-c`, `--compress`            only compress
+- `-d`, `--decompress`          only decompress
+- `-o`, `--output=FILE`         output path
+- `-v`, `--verbose`             verbose
+- `-?`, `--help`                Give this help list
 - `--usage`                     Give a short usage message
-- `V`, `--version`              Print program version  
+- `-V`, `--version`             Print program version  
   
 Examples:  
 `gbxlzo Race01.Challenge.Gbx -d -v -o Race01.Uncompressed.Challenge.Gbx`  
@@ -34,8 +34,8 @@ This project uses the miniLZO library. You can read the license [here](https://g
 This project requires gcc compiler, make and cmake.  
 
 ```
-$ git clone https://github.com/GreffMASTER/GBXLZO/  
-$ mkdir build && cd build  
-$ cmake ..    
-$make
+git clone https://github.com/GreffMASTER/GBXLZO/  
+mkdir build && cd build  
+cmake ..    
+make
 ```
