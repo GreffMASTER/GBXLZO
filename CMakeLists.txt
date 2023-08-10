@@ -4,6 +4,7 @@ project(gbxlzo)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_C_FLAGS_RELEASE "-O0")
 
 add_executable(${PROJECT_NAME} src/main.c src/gbx.c src/minilzo/minilzo.c)
 file(COPY TestFiles DESTINATION ${CMAKE_BINARY_DIR})
