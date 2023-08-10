@@ -1,6 +1,6 @@
 # GBXLZO
-### A tool for decompressing/compressing GameBox files. (*.Gbx)
-
+### A tool for decompressing/compressing GameBox files. (*.Gbx)  
+![CMake Test](https://github.com/GreffMASTER/GBXLZO/actions/workflows/cmake.yml/badge.svg)
 
 Usage (Windows): `gbxlzo <infile> [params]`  
 Parameters:  
